@@ -1,4 +1,3 @@
-// radmultibench/models/biovil_t.py
 import torch
 import torch.nn as nn
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
