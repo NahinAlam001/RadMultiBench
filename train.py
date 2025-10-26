@@ -1,3 +1,4 @@
+// train.py
 import argparse
 import os
 import json
@@ -157,7 +158,11 @@ def main(args):
         )
 
         # 6. Checkpointing
-        if metric > best_metric:
+        # =================== FIX ===================
+        # Changed from `>` to `>=` to save the model on the first epoch
+        # even if the score is 0.0, preventing the FileNotFoundError.
+        if metric >= best_metric:
+        # ===========================================
             best_metric = metric
             model_path = os.path.join(cfg.OUTPUT_DIR, "best_model.pth")
             torch.save(model.state_dict(), model_path)
@@ -172,6 +177,7 @@ def main(args):
 
     # Load best model
     best_model_path = os.path.join(cfg.OUTPUT_DIR, "best_model.pth")
+    # This line will no longer crash, as the file will exist.
     model.load_state_dict(torch.load(best_model_path))
 
     if cfg.TASK == "classification":
