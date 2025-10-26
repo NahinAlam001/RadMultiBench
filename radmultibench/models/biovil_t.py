@@ -1,3 +1,4 @@
+// radmultibench/models/biovil_t.py
 import torch
 import torch.nn as nn
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
@@ -43,7 +44,14 @@ class BioViLTClassifier(nn.Module):
 
     def forward(self, images, texts, mode="vision+text"):
       with torch.no_grad():
-          image_features = self.image_model(images).img_embedding
+          # =================== FIX ===================
+          # Get the 2048-dim patch embeddings, not the 128-dim joint embedding
+          patch_features = self.image_model(images).patch_embeddings # [B, 2048, 7, 7]
+          # Pool them to get [B, 2048]
+          pooled_features = self.image_pool(patch_features)
+          image_features = pooled_features.squeeze(-1).squeeze(-1) # [B, 2048]
+          # ===========================================
+          
           tokenized = self.text_inference.tokenizer(
               texts, padding=True, truncation=True,
               max_length=512, return_tensors='pt'
@@ -51,15 +59,21 @@ class BioViLTClassifier(nn.Module):
           text_features = self.text_model.get_projected_text_embeddings(
               input_ids=tokenized['input_ids'],
               attention_mask=tokenized['attention_mask'],
-          )
+          ) # [B, 128]
 
       if mode == "vision+text":
+          # This is now [B, 2048 + 128] = [B, 2176]
           fused = torch.cat([image_features, text_features], dim=1)
       elif mode == "vision_only":
+          # This is now [B, 2048 + 0] = [B, 2176]
           fused = torch.cat([image_features, torch.zeros_like(text_features)], dim=1)
       elif mode == "text_only":
-          fused = torch.cat([torch.zeros_like(image_features), text_features], dim=1)
+          # This is now [B, 0 + 128] = [B, 2176]
+          # Note: We must create zeros with the correct image feature size
+          image_zeros = torch.zeros_like(image_features)
+          fused = torch.cat([image_zeros, text_features], dim=1)
 
+      # This will now work, as `fused` is [B, 2176]
       logits = self.classifier(fused)
       return logits
 
