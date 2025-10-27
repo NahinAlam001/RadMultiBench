@@ -3,7 +3,7 @@
 This repository contains the code to reproduce all experiments for the paper:  
 **"RadMultiBench: A Multimodal Benchmark Dataset for Diagnostic Radiology"**
 
-The code is modular and config-driven. **All results in the paper are reproducible using these instructions and the released configuration files.**  
+The code is modular and config-driven. All results in the paper are reproducible using these instructions and the released configuration files.  
 > **Note:** The dataset will be made public upon paper acceptance. For review, please contact the authors for private access if needed.
 
 ***
@@ -27,12 +27,18 @@ The code is modular and config-driven. **All results in the paper are reproducib
    ```bash
    pip install -r requirements.txt
    ```
-   (This will also install any necessary dependencies like `hi-ml-multimodal` and `clip`.)
+   (Includes necessary dependencies like `hi-ml-multimodal` and `clip`.)
 
-3. **Obtain the Data:**
-   - **Upon acceptance**, download links for `Medical/clean_map.csv` and image folder will be made public.
-   - **For reviewers:** Contact the authors by email (see paper) to receive a private dataset link.
-   - Once you have access, place data in the default structure:
+3. **Obtain the Dataset:**
+   - For private review access, download the dataset directly using `gdown`:
+     ```bash
+     pip install gdown
+     gdown 'https://docs.google.com/uc?export=download&id=1nZyV1NPTcEV6zN_MZPiWGzLujBqI_3pH'
+     unzip data.zip
+     rm data.zip
+     mv data Medical
+     ```
+   - Once extracted, ensure the directory structure is as follows:
      ```
      Medical/
          clean_map.csv
@@ -54,24 +60,24 @@ The code is modular and config-driven. **All results in the paper are reproducib
 
 **Main script:** `train.py` (handles both classification and generation/multimodal tasks).
 
-### How to Run:
-- **Always specify a config file with `--config-file`.**  
-- Example commands:
+### How to Run
+Always specify a config file with `--config-file`.  
+Example commands:
 
-   **Classification – ResNet-LSTM:**
-   ```bash
-   python train.py --config-file configs/model_resnet_lstm_class.yaml
-   ```
+**Classification – ResNet-LSTM:**
+```bash
+python train.py --config-file configs/model_resnet_lstm_class.yaml
+```
 
-   **Generation – ResNet-LSTM:**
-   ```bash
-   python train.py --config-file configs/model_resnet_lstm_gen.yaml
-   ```
+**Generation – ResNet-LSTM:**
+```bash
+python train.py --config-file configs/model_resnet_lstm_gen.yaml
+```
 
-   *(Other configs available in `configs/` for CLIP-GPT and BioViL-T models)*
+(Other configs available in `configs/` for CLIP-GPT and BioViL-T models.)
 
-- **Evaluation:**  
-  - By default, metrics and predictions are saved to `.csv` or `.json` in the `output/` folder.
+**Evaluation:**  
+By default, metrics and predictions are saved to `.csv` or `.json` in the `output/` folder.
 
 ***
 
@@ -79,9 +85,9 @@ The code is modular and config-driven. **All results in the paper are reproducib
 
 - [x] Same dataset splits as in the paper  
 - [x] All model parameters/configs included  
-- [x] Hardware used (optional) and software dependencies clearly specified  
+- [x] Hardware used and dependencies clearly specified  
 - [x] Scripted training and evaluation pipeline  
-- [x] Code is self-contained (as soon as data becomes public/available)
+- [x] Code is self-contained (as soon as data becomes public)
 
 ***
 
@@ -97,5 +103,3 @@ The code is modular and config-driven. **All results in the paper are reproducib
   *A: See the `configs/` directory for YAML files replicating each experimental setup from the paper.*
 
 ***
-
-If you would like this README adapted with your real contact info, or if you want short instructions for visualization or advanced options, let me know! (nahin.alam@northsouth.edu)
