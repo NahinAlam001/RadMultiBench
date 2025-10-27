@@ -4,7 +4,7 @@ import json
 import time
 import pandas as pd
 import torch
-from transformers import GPT2Tokenizer  # For gen eval
+from transformers import GPT2Tokenizer 
 
 import nltk
 nltk.download('punkt_tab')
@@ -35,7 +35,7 @@ def compute_class_distribution(cfg):
     """
     df = pd.read_csv(cfg.DATA.CSV_PATH)
     
-    # Pre-process dataframe (same as in data.py)
+    # Pre-process dataframe
     df['Category'] = df['Image'].apply(extract_category)
     df = df[df['Category'] != 'Other']
     df['Category_Label'] = df['Category'].map(CATEGORY_MAPPING)
@@ -69,8 +69,7 @@ def main(args):
     # 3. Build DataLoaders
     logger.info("Building dataloaders...")
     train_loader, val_loader, test_loader, vocab = build_dataloaders(cfg)
-
-    # (Hacky, but needed for LSTM models)
+ 
     if vocab:
         logger.info(f"Vocabulary built: {len(vocab)} unique tokens.")
 
@@ -112,7 +111,7 @@ def main(args):
                 f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}, Val F1: {val_f1:.4f}"
             )
 
-            metric = val_f1  # Use F1 as primary metric for imbalanced datasets
+            metric = val_f1 
 
         else:  # generation
             train_loss = train_one_epoch_gen(
@@ -139,12 +138,12 @@ def main(args):
                 f"RL={metrics['ROUGE-L']:.4f}"
             )
             logger.info(
-                f"  Val METEOR: {metrics['METEOR']:.4f}"  # ADD THIS LINE
+                f"  Val METEOR: {metrics['METEOR']:.4f}" 
             )
             
-            metric = metrics['BLEU-4']  # Use BLEU-4 as the checkpointing metric
+            metric = metrics['BLEU-4']  # Using BLEU-4 as the checkpointing metric
 
-        # Get current learning rate
+        # Getting current learning rate
         current_lr = optimizer.param_groups[0]['lr']
         
         history.append(
@@ -157,9 +156,6 @@ def main(args):
         )
 
         # 6. Checkpointing
-        # =================== FIX ===================
-        # Changed from `>` to `>=` to save the model on the first epoch
-        # even if the score is 0.0, preventing the FileNotFoundError.
         if metric >= best_metric:
         # ===========================================
             best_metric = metric
@@ -176,7 +172,6 @@ def main(args):
 
     # Load best model
     best_model_path = os.path.join(cfg.OUTPUT_DIR, "best_model.pth")
-    # This line will no longer crash, as the file will exist.
     model.load_state_dict(torch.load(best_model_path))
 
     if cfg.TASK == "classification":
@@ -222,7 +217,6 @@ def main(args):
             model, test_loader, device, cfg, lstm_vocab
         )
         
-        # Around line 165-175 in train.py
         logger.info("=" * 80)
         logger.info("FINAL TEST RESULTS - REPORT GENERATION")
         logger.info("=" * 80)
@@ -237,7 +231,7 @@ def main(args):
         logger.info(f"  ROUGE-2: {test_metrics['ROUGE-2']:.4f}")
         logger.info(f"  ROUGE-L: {test_metrics['ROUGE-L']:.4f}")
         logger.info("-" * 80)
-        logger.info(f"  METEOR:  {test_metrics['METEOR']:.4f}")  # ADD THIS LINE
+        logger.info(f"  METEOR:  {test_metrics['METEOR']:.4f}") 
         logger.info("=" * 80)
 
         
@@ -252,7 +246,7 @@ def main(args):
             "rouge_1": float(test_metrics['ROUGE-1']),
             "rouge_2": float(test_metrics['ROUGE-2']),
             "rouge_l": float(test_metrics['ROUGE-L']),
-            "meteor": float(test_metrics['METEOR']),  # ADD THIS LINE
+            "meteor": float(test_metrics['METEOR']),  
             "best_val_metric": float(best_metric),
             "num_epochs": cfg.SOLVER.NUM_EPOCHS,
             "num_params_M": num_params / 1e6,

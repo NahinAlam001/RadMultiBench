@@ -179,7 +179,7 @@ def evaluate_generation(model, dataloader, device, cfg, lstm_vocab=None):
             images = batch['image'].to(device)
             raw_texts = batch['raw_texts']
 
-            # Generate predictions based on model type
+            
             # Generate predictions based on model type
             if cfg.MODEL.NAME == "resnet_lstm_generation":
                 # For LSTM, pass vocab and let model generate text directly
@@ -249,5 +249,5 @@ def evaluate_generation(model, dataloader, device, cfg, lstm_vocab=None):
         'ROUGE-1': rouge_1,
         'ROUGE-2': rouge_2,
         'ROUGE-L': rouge_l,
-        'METEOR': meteor,  # NEW
+        'METEOR': meteor,  
     }

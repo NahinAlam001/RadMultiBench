@@ -5,8 +5,7 @@ import torch.optim as optim
 
 class WarmupLinearSchedule:
     """
-    Implements the Noam LR scheduler (inverse Sqrt decay with linear warmup).
-    [cite_start]This is the CORRECTED implementation based on Eq. 15 [cite: 183-184].
+    Implements the Noam LR scheduler (inverse Sqrt decay with linear warmup). 
     """
 
     def __init__(self, optimizer, warmup_steps, max_lr):
@@ -20,7 +19,7 @@ class WarmupLinearSchedule:
         t = self.current_step
         T_w = self.warmup_steps
 
-        # [cite_start]This correctly implements Eq. 15 [cite: 183-184]
+    
         linear_warmup = min(1.0, t / T_w)
         inv_sqrt_decay = 1.0 / math.sqrt(max(t, T_w))
         lr = self.max_lr * linear_warmup * inv_sqrt_decay

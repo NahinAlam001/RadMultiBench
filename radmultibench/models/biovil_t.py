@@ -13,7 +13,7 @@ from health_multimodal.text import get_bert_inference
 
 class BioViLTClassifier(nn.Module):
     """BioViL-T for classification."""
-    def __init__(self, num_classes=5, fused_dim=2176, dropout=0.1): # <-- Expect 2176
+    def __init__(self, num_classes=5, fused_dim=2176, dropout=0.1): 
         super(BioViLTClassifier, self).__init__()
 
         self.image_model = ImageModel(
@@ -35,7 +35,7 @@ class BioViLTClassifier(nn.Module):
         # Fused_dim is 2176 (2048 from image + 128 from text)
         self.classifier = nn.Sequential(
             nn.Dropout(dropout),
-            nn.Linear(fused_dim, 512), # <-- Will be 2176x512
+            nn.Linear(fused_dim, 512), 
             nn.ReLU(),
             nn.Dropout(dropout),
             nn.Linear(512, num_classes)
@@ -43,8 +43,7 @@ class BioViLTClassifier(nn.Module):
 
     def forward(self, images, texts, mode="vision+text"):
       with torch.no_grad():
-          # =================== FIX ===================
-          # Get the 2048-dim patch embeddings, not the 128-dim joint embedding
+          
           patch_features = self.image_model(images).patch_embeddings # [B, 2048, 7, 7]
           # Pool them to get [B, 2048]
           pooled_features = self.image_pool(patch_features)
@@ -84,7 +83,7 @@ class BioViLTClassifier(nn.Module):
 
 class BioViLTGPTGenerator(nn.Module):
     """BioViL-T for Generation."""
-    def __init__(self, image_dim=2048, gpt_dim=768, dropout=0.1, prefix_length=1): # <-- Change image_dim to 2048
+    def __init__(self, image_dim=2048, gpt_dim=768, dropout=0.1, prefix_length=1): 
         super(BioViLTGPTGenerator, self).__init__()
 
         self.image_model = ImageModel(
@@ -98,20 +97,19 @@ class BioViLTGPTGenerator(nn.Module):
         self.gpt_dim = gpt_dim
         self.prefix_length = prefix_length
         
-        # --- ADD THIS LAYER ---
+        
         self.image_pool = nn.AdaptiveAvgPool2d((1, 1))
         
         # image_dim is now 2048
         self.vision_projection = nn.Sequential(
-            nn.Linear(image_dim, gpt_dim), # <-- This now correctly expects 2048
+            nn.Linear(image_dim, gpt_dim), 
             nn.ReLU(),
             nn.Dropout(dropout)
         )
 
     def forward(self, images, input_ids, attention_mask):
         with torch.no_grad():
-            # --- MODIFY THIS BLOCK ---
-            # Get the 2048-dim patch embeddings
+            
             patch_features = self.image_model(images).patch_embeddings
             # Pool them to get [B, 2048]
             pooled_features = self.image_pool(patch_features)
@@ -141,7 +139,7 @@ class BioViLTGPTGenerator(nn.Module):
         batch_size = images.size(0)
         device = images.device
         with torch.no_grad():
-            # --- ALSO MODIFY THIS BLOCK ---
+            
             patch_features = self.image_model(images).patch_embeddings
             pooled_features = self.image_pool(patch_features)
             image_features = pooled_features.squeeze(-1).squeeze(-1) # [B, 2048]

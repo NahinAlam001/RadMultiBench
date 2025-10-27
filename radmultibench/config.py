@@ -1,5 +1,5 @@
 import os
-import yaml  # <-- Make sure this import is at the top
+import yaml  
 from yacs.config import CfgNode as CN
 
 _C = CN()
@@ -63,22 +63,22 @@ def get_cfg_defaults():
 
 def load_cfg_from_file(cfg_path: str):
     """Load config from a YAML file."""
-    # 1. Start with the default config
+    
     cfg = get_cfg_defaults()
 
-    # 2. Manually open the specific config file to check for _BASE_
+    
     with open(cfg_path, 'r') as f:
         config_data = yaml.safe_load(f)
 
-    # 3. If _BASE_ exists, load the base config FIRST
+    
     if "_BASE_" in config_data:
         base_cfg_path = os.path.join(os.path.dirname(cfg_path), config_data["_BASE_"])
         cfg.merge_from_file(base_cfg_path)
     
-    # 4. Now, merge the specific config file. This will override the base.
+    
     cfg.merge_from_file(cfg_path)
     
-    # 5. Clean up the _BASE_ key
+    
     if "_BASE_" in cfg:
         cfg.pop("_BASE_")
 
@@ -91,9 +91,9 @@ def setup_cfg(args):
     Loads from YAML, merges with command-line args, and freezes.
     """
     cfg = load_cfg_from_file(args.config_file)
-    cfg.merge_from_list(args.opts)  # Override from command line
+    cfg.merge_from_list(args.opts)  
 
-    # Update output dir
+    
     model_name = cfg.MODEL.NAME
     cfg.OUTPUT_DIR = os.path.join(cfg.OUTPUT_DIR, model_name)
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)

@@ -8,7 +8,7 @@ from torchvision import models
 # -----------------------------------------------
 
 class ResNetLSTMModel(nn.Module):
-    #[cite_start]"""Implements ResNet-LSTM for classification[cite: 131, 134]."""
+    
     def __init__(self, vocab_size, num_classes=5, embed_dim=300, lstm_hidden=512, dropout=0.1):
         super(ResNetLSTMModel, self).__init__()
 
@@ -65,7 +65,7 @@ class ResNetLSTMModel(nn.Module):
 # -----------------------------------------------
 
 class ResNetEncoder(nn.Module):
-    #[cite_start]"""Encoder for ResNet-LSTM Generation [cite: 152-154]."""
+    
     def __init__(self, finetune=False):
         super(ResNetEncoder, self).__init__()
         resnet = models.resnet50(pretrained=True)
@@ -87,7 +87,7 @@ class ResNetEncoder(nn.Module):
         return features, pooled_features
 
 class BahdanauAttention(nn.Module):
-    #[cite_start]"""Implements Bahdanau Attention [cite: 160-164]."""
+    
     def __init__(self, encoder_dim, decoder_dim, attention_dim):
         super(BahdanauAttention, self).__init__()
         self.W_h = nn.Linear(decoder_dim, attention_dim)
@@ -103,7 +103,7 @@ class BahdanauAttention(nn.Module):
         return context, alpha.squeeze(-1)
 
 class LSTMDecoder(nn.Module):
-    #[cite_start]"""LSTM Decoder with Attention [cite: 155-164]."""
+    
     def __init__(self, vocab_size, embed_dim, lstm_hidden, encoder_dim, attention_dim, dropout):
         super(LSTMDecoder, self).__init__()
         self.vocab_size = vocab_size

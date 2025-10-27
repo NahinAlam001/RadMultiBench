@@ -540,8 +540,8 @@ def build_dataloaders(cfg):
     train_loader = DataLoader(
         train_dataset, 
         batch_size=batch_size, 
-        sampler=train_sampler,  # Will be None for generation tasks
-        shuffle=(train_sampler is None),  # Only shuffle if no sampler
+        sampler=train_sampler,  
+        shuffle=(train_sampler is None),  
         num_workers=num_workers, 
         collate_fn=collate_fn, 
         pin_memory=True,

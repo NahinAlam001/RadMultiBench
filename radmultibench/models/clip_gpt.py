@@ -8,7 +8,7 @@ from transformers import GPT2LMHeadModel, GPT2Tokenizer
 # -----------------------------------------------
 
 class MultimodalCLIPClassifier(nn.Module):
-    #[cite_start]"""Implements Eq. 3 for classification[cite: 131, 134]."""
+    
     def __init__(self, num_classes=5, dropout=0.1, clip_dim=512):
         super(MultimodalCLIPClassifier, self).__init__()
 
@@ -18,7 +18,7 @@ class MultimodalCLIPClassifier(nn.Module):
         for param in self.clip_model.parameters():
             param.requires_grad = False
 
-        fused_dim = self.clip_dim * 2 # 512 (image) + 512 (text)
+        fused_dim = self.clip_dim * 2 
 
         self.classifier = nn.Sequential(
             nn.Dropout(dropout),
@@ -48,7 +48,7 @@ class MultimodalCLIPClassifier(nn.Module):
 # -----------------------------------------------
 
 class CLIPGPTGenerationModel(nn.Module):
-    #[cite_start]"""Implements Fig. 3 for generation [cite: 138-150]."""
+    
     def __init__(self, clip_dim=512, gpt_dim=768, dropout=0.1, prefix_length=1):
         super(CLIPGPTGenerationModel, self).__init__()
 
@@ -92,19 +92,19 @@ class CLIPGPTGenerationModel(nn.Module):
     @torch.no_grad()
     def generate(self, images, tokenizer, max_gen_len=60):
         self.eval()
-        batch_size = images.size(0) # <-- ADD
-        device = images.device     # <-- ADD
+        batch_size = images.size(0) 
+        device = images.device     
         with torch.no_grad():
             image_features = self.clip_model.encode_image(images).float()
             image_prefix = self.vision_projection(image_features).unsqueeze(1)
 
-        # --- ADD THIS MASK ---
+        
         attention_mask = torch.ones(batch_size, self.prefix_length, dtype=torch.long).to(device)
-        # ---------------------
+        
 
         generated_ids = self.gpt_model.generate(
             inputs_embeds=image_prefix,
-            attention_mask=attention_mask, # <-- PASS THE MASK
+            attention_mask=attention_mask, 
             max_length=max_gen_len + self.prefix_length,
             bos_token_id=tokenizer.bos_token_id,
             eos_token_id=tokenizer.eos_token_id,

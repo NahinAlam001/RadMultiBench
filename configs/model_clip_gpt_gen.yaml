@@ -10,7 +10,7 @@ MODEL:
   PREFIX_LENGTH: 1
 
 DATA:
-  MAX_SEQ_LEN: 128 # GPT-2 can handle longer sequences
+  MAX_SEQ_LEN: 128 
 
 SOLVER:
   NUM_EPOCHS: 20
